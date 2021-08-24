@@ -16,11 +16,6 @@ end
 require'packer'.startup(function()
   -- plugin manager
   use 'wbthomason/packer.nvim'
-  -- syntax highlighting
-  use {
-    'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate',
-  }
   -- color scheme
   use 'sainnhe/sonokai'
   -- icons
@@ -155,18 +150,6 @@ map('n', '?', ':let @/=""<cr>', { silent = true })
 map('n', 'Q', '@q', {})
 map('n', 'R', 'r', { noremap = true })
 map('n', 'r', '<C-r>', { noremap = true })
-
--- nvim-treesitter
-require'nvim-treesitter.configs'.setup{
-  -- install maintained language parsers
-  ensure_installed = 'maintained',
-  -- enable syntax highlighting
-  highlight = {
-    enable = true,
-    -- angular highlighting has quirks so HTML is disabled
-    disable = { 'html' },
-  },
-}
 
 -- nvim.tree
 vim.g.nvim_tree_width = '25%'
