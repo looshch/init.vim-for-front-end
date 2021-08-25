@@ -1,4 +1,0 @@
-{
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
-  "typescript.preferences.importModuleSpecifier": "non-relative"
-}

@@ -1,8 +1,6 @@
 For Neovim v0.5+ \
 \
-Install [Node.js](https://nodejs.org), [Yarn](https://yarnpkg.com) (for
-front-end development) and [ripgrep](https://github.com/BurntSushi/ripgrep),
-place `init.lua` and `coc-settings.json` (for front-end development) to
+Install [ripgrep](https://github.com/BurntSushi/ripgrep), place `init.lua` to
 `~/.config/nvim/`, open Neovim and wait for installation completion \
 \
 Consult comments in `init.lua` and

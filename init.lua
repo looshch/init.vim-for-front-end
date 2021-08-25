@@ -6,7 +6,7 @@ local cmd = vim.cmd
 local set = vim.opt
 local map = vim.api.nvim_set_keymap
 
--- auto load plugin manager; Node.js, Yarn (for front-end development) and ripgrep are required
+-- auto load plugin manager; ripgrep is required
 local packer_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(packer_path)) > 0 then
   fn.system({ 'git', 'clone', 'https://github.com/wbthomason/packer.nvim', packer_path })
@@ -25,15 +25,17 @@ require'packer'.startup(function()
   -- file search
   use 'junegunn/fzf'
   use 'junegunn/fzf.vim'
-  -- language server
+  -- LSP configurator
+  use 'neovim/nvim-lspconfig'
+  -- auto completion
+  use 'hrsh7th/nvim-compe'
+  -- auto pairs
   use {
-    'neoclide/coc.nvim',
-    branch = 'release',
+    'windwp/nvim-autopairs',
+     config = function()
+       require('nvim-autopairs').setup()
+     end,
   }
-  -- snippets
-  use 'honza/vim-snippets'
-  -- auto change corresponding HTML tag
-  use 'AndrewRadev/tagalong.vim'
   -- comment code out
   use 'tpope/vim-commentary'
 end)
@@ -112,13 +114,6 @@ set.tabline = '%!v:lua.tabline()'
 cmd'autocmd BufWritePre * %s/\\s\\+$//e'
 -- put cursor on last known position on open
 cmd'autocmd BufReadPost * if line("\'\\"") > 1 && line("\'\\"") <= line("$") | exe "normal! g\'\\"" | endif'
--- comments support in JSON
-cmd'autocmd FileType json syntax match Comment +\\/\\/.\\+$+'
--- each tab stops after even number of chars
--- tab indents by 2 spaces
--- use spaces instead of tabs
--- indentation level in columns for indenting tools
-cmd'autocmd Filetype javascript,typescript,html,css,scss,sass,less set tabstop=2 softtabstop=2 expandtab shiftwidth=2'
 
 -- <leader> is space
 vim.g.mapleader = ' '
@@ -176,49 +171,36 @@ map('n', '<leader>t', ':Rg<cr>', { silent = true })
 -- file search by [n]ame
 map('n', '<leader>n', ':GFiles<cr>', { silent = true })
 
--- CoC
--- requirement
-set.hidden = true
-vim.g.coc_global_extensions = {
-  'coc-sumneko-lua',
-  'coc-pairs',
-  'coc-json',
-  'coc-sh',
-  'coc-go',
-  'coc-sql',
-  'coc-snippets',
-  'coc-emmet',
-  'coc-html',
-  'coc-htmlhint',
-  'coc-html-css-support',
-  'coc-css',
-  'coc-cssmodules',
-  'coc-svg',
-  'coc-tsserver',
-  'coc-angular',
-}
--- trigger autocompletion on Enter
-map('i', '<cr>', 'pumvisible() ? "<C-y>" : "<C-g>u<cr>"', { noremap = true, expr = true })
--- select first autocomplete entry and format code
-map('i', '<cr>', 'pumvisible() ? coc#_select_confirm() : "<C-g>u<cr><C-r>=coc#on_enter()<cr>"', { silent = true, noremap = true, expr = true })
+-- nvim-lspconfig
+--   language servers should be installed manually
+--     gopls: go get golang.org/x/tools/gopls@latest
 -- show [n]ext diagnostic
-map('n', '<leader>N', '<Plug>(coc-diagnostic-next)', { silent = true })
+map('n', '<leader>N', ':lua vim.lsp.diagnostic.goto_next()<cr>', { silent = true })
 -- show [p]revious diagnostic
-map('n', '<leader>P', '<Plug>(coc-diagnostic-prev)', { silent = true })
+map('n', '<leader>P', ':lua vim.lsp.diagnostic.goto_prev()<cr>', { silent = true })
 -- show symbol [r]eferences
-map('n', '<leader>r', '<Plug>(coc-references)', {})
--- jump to [i]mplementation in new tab
-map('n', '<leader>i', ':call CocAction("jumpImplementation", "tab drop")<cr>', { silent = true })
+map('n', '<leader>r', ':lua vim.lsp.buf.references()<cr>', { silent = true })
 -- jump to [d]efinition in new tab
-map('n', '<leader>d', ':call CocAction("jumpDefinition", "tab drop")<cr>', { silent = true })
+map('n', '<leader>d', ':lua vim.lsp.buf.definition()<cr>', { silent = true })
 -- [f]ormat
-map('x', '<leader>f', '<Plug>(coc-format-selected)', {})
+map('n', '<leader>f', ':lua vim.lsp.buf.formatting()<cr>', { silent = true })
 -- code [a]ction (imports, infer type, etc.)
-map('n', '<leader>a', '<Plug>(coc-codeaction)', { silent = true })
+map('n', '<leader>a', ':lua vim.lsp.buf.code_action()<cr>', { silent = true })
 -- [r]ename symbol
-map('n', '<leader>R', '<Plug>(coc-rename)', {})
--- highlight symbol occurrences
-cmd'autocmd CursorHold * silent call CocActionAsync("highlight")'
+map('n', '<leader>R', ':lua vim.lsp.buf.rename()<cr>', { silent = true })
+require'lspconfig'.gopls.setup{}
+
+-- nvim-compe
+set.completeopt = 'menuone,noselect'
+-- auto select first entry
+require'compe'.setup{
+  source = {
+    path = true;
+    buffer = true;
+    nvim_lsp = true;
+  },
+}
+map('i', '<CR>', 'compe#confirm(luaeval("require \'nvim-autopairs\'.autopairs_cr()"))', { expr = true })
 
 -- vim-commentary. Toggle line [c]ommenting
 map('n', '<leader>c', 'gc', {})
