@@ -9,10 +9,17 @@ local map = vim.api.nvim_set_keymap
 -- auto load plugin manager; ripgrep is required
 local packer_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(packer_path)) > 0 then
-  fn.system({ 'git', 'clone', 'https://github.com/wbthomason/packer.nvim', packer_path })
+  fn.system({
+	'git', 'clone', 'https://github.com/wbthomason/packer.nvim',
+	packer_path
+  })
   execute'packadd packer.nvim'
 end
 -- plugins
+-- banned authors:
+--   neoclide — CoC and hype around Node.js being a LSP interface must die
+--   hrsh7th — his plugins have taken too much time to set up and eventually
+--             still didn’t satisfy me
 require'packer'.startup(function()
   -- plugin manager
   use 'wbthomason/packer.nvim'
@@ -91,7 +98,8 @@ set.timeoutlen = 150
 set.updatetime = 50
 -- preferred number of lines before horizontal edges while scrolling
 set.scrolloff = 7
--- display full path to opened file, modification and readonly flags, column number
+-- display full path to opened file, modification and readonly flags, column
+-- number
 set.statusline = '%F%m%r Column: %v'
 -- display tab number, file name and modification flag in tab line
 function tabline()
@@ -142,8 +150,12 @@ map('n', '<leader>8', '8gt', {})
 map('n', '<leader>9', '9gt', {})
 -- clear search
 map('n', '?', ':let @/=""<cr>', { silent = true })
+-- play ‘q’ macro
 map('n', 'Q', '@q', {})
+-- replace char instead of replace mode because only practical use I see is
+-- changing name in space-aligned variable declaration/initialization
 map('n', 'R', 'r', { noremap = true })
+-- r is redo to align with undo
 map('n', 'r', '<C-r>', { noremap = true })
 
 -- nvim.tree
@@ -159,9 +171,15 @@ vim.g.nvim_tree_add_trailing = 1
 -- folders with one folder only are grouped
 vim.g.nvim_tree_group_empty = 1
 -- toggle file [b]rowser
-map('n', '<leader>b', ':NvimTreeRefresh<cr> :NvimTreeToggle<cr> :set relativenumber<cr>', { silent = true })
+map('n',
+    '<leader>b',
+	':NvimTreeRefresh<cr> :NvimTreeToggle<cr> :set relativenumber<cr>',
+	{ silent = true })
 -- [l]ocate current file in file browser
-map('n', '<leader>l', ':NvimTreeRefresh<cr> :NvimTreeFindFile<cr> :set relativenumber<cr>', { silent = true })
+map('n',
+    '<leader>l',
+	':NvimTreeRefresh<cr> :NvimTreeFindFile<cr> :set relativenumber<cr>',
+	{ silent = true })
 
 -- fzf.vim
 -- force Rg search by text only
@@ -172,12 +190,17 @@ map('n', '<leader>t', ':Rg<cr>', { silent = true })
 map('n', '<leader>n', ':GFiles<cr>', { silent = true })
 
 -- nvim-lspconfig
---   language servers should be installed manually
---     gopls: go get golang.org/x/tools/gopls@latest
+-- gopls should be installed manually: go get golang.org/x/tools/gopls@latest
 -- show [n]ext diagnostic
-map('n', '<leader>N', ':lua vim.lsp.diagnostic.goto_next()<cr>', { silent = true })
+map('n',
+    '<leader>N',
+    ':lua vim.lsp.diagnostic.goto_next()<cr>',
+	{ silent = true })
 -- show [p]revious diagnostic
-map('n', '<leader>P', ':lua vim.lsp.diagnostic.goto_prev()<cr>', { silent = true })
+map('n',
+    '<leader>P',
+	':lua vim.lsp.diagnostic.goto_prev()<cr>',
+	{ silent = true })
 -- show symbol [r]eferences
 map('n', '<leader>r', ':lua vim.lsp.buf.references()<cr>', { silent = true })
 -- jump to [d]efinition in new tab
@@ -189,7 +212,7 @@ map('n', '<leader>a', ':lua vim.lsp.buf.code_action()<cr>', { silent = true })
 -- [r]ename symbol
 map('n', '<leader>R', ':lua vim.lsp.buf.rename()<cr>', { silent = true })
 -- nvim-lspconfig & completion-nvim
-require'lspconfig'.gopls.setup{on_attach=require'completion'.on_attach}
+require'lspconfig'.gopls.setup{ on_attach=require'completion'.on_attach }
 
 -- completion-nvim
 set.completeopt = 'menuone,noinsert,noselect'
